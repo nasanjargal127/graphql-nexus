@@ -1,0 +1,44 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String @id @default(cuid())
+  firstname String
+  lastname  String
+  email     String @unique
+  password  String
+  votes     Vote[]
+}
+
+model Board {
+  id          String @id @default(cuid())
+  name        String
+  description String
+  items       Item[]
+}
+
+model Item {
+  id      String @id @default(cuid())
+  content String
+  boardId String
+  board   Board  @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  votes   Vote[]
+}
+
+model Vote {
+  userId String
+  itemId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  item   Item   @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@id([userId, itemId])
+}
